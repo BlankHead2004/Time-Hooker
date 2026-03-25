@@ -4,7 +4,7 @@
 
 ### Speed Up or Slow Down Any Webpage — Right From Your Browser
 
-[![Install with Tampermonkey](https://img.shields.io/badge/Install-Tampermonkey-00485B?style=for-the-badge&logo=tampermonkey&logoColor=white)](https://raw.githubusercontent.com/BlankHead2004/TimeHooker/main/TimeHooker.user.js)
+[![Install with Tampermonkey](https://img.shields.io/badge/Install-Tampermonkey-00485B?style=for-the-badge&logo=tampermonkey&logoColor=white)]([https://raw.githubusercontent.com/BlankHead2004/TimeHooker/main/TimeHooker.user.js](https://github.com/BlankHead2004/Time-Hooker/blob/main/TimeHooker.user.js))
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-2.0-blue?style=for-the-badge)]()
 [![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Compatible-orange?style=for-the-badge&logo=tampermonkey)]()
