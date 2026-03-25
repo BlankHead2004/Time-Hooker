@@ -100,7 +100,7 @@ You need a userscript manager extension:
 
 1. **Click the button below** — Tampermonkey will detect it automatically:
 
-   [![Install TimeHooker](https://img.shields.io/badge/⏱️_Install_TimeHooker-Click_Here-22c55e?style=for-the-badge&logoColor=white)](https://raw.githubusercontent.com/BlankHead2004/TimeHooker/main/TimeHooker.user.js)
+   [![Install TimeHooker](https://img.shields.io/badge/⏱️_Install_TimeHooker-Click_Here-22c55e?style=for-the-badge&logoColor=white)](https://github.com/BlankHead2004/Time-Hooker/blob/main/TimeHooker.user.js)
 
 2. Tampermonkey will show a confirmation dialog → click **Install**.
 3. Done. Visit any page and look for the **green bubble** on the left edge.
