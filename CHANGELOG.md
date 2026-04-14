@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.1] - 2026-04-14
+
+### Added
+- **CSS Animation & Transition speed control** — uses `document.getAnimations()` to set `playbackRate` on all running CSS animations and transitions
+- **Web Animations API hook** — intercepts `Element.prototype.animate()`, scaling `duration`, `delay`, and `endDelay` by the speed multiplier and setting `playbackRate` on returned animations
+- **Continuous animation poll** — polls every 500 ms to catch newly-created animations and apply the current speed, ensuring dynamically-added CSS animations are also affected
+- **Auto-cleanup** — CSS speed overrides are automatically removed when speed resets to 1x
+- **Debug logging** — 16 log points with `[TimeHooker]` prefix (green in console) for easy troubleshooting; controlled by `TH_DEBUG` flag
+
+### Changed
+- Speed setter (`setSpeed()`) now also triggers CSS animation sync and starts the animation poll
+- Boot sequence now activates CSS/animation hooks immediately if a non-1x speed is persisted from localStorage
+
+---
+
+## [3.0] - 2026-04-14
+
+### Changed
+- **Hardened boot sequence** — 5-strategy approach (direct check → DOMContentLoaded → readystatechange → MutationObserver → polling fallback) ensures the UI appears on virtually any site
+- MutationObserver now targets `document.documentElement || document` with `subtree: true` instead of just `childList` on documentElement
+- All timing hooks wrapped in individual `try/catch` blocks — if one hook fails (e.g., site freezes prototypes), others still apply
+- Shadow DOM creation now uses fallback chain: closed → open → plain div
+- Saved native `MutationObserver` reference to prevent sites from overriding it
+- Outside-click listener now uses capture phase for maximum reliability
+- `getHTML()` uses concatenated strings instead of template literals for broader engine compatibility
+
+### Added
+- **Watchdog system** — polls every 2 s to verify the UI host element is still in the DOM; re-injects automatically if removed by SPAs or page frameworks
+- **Body-replacement observer** — detects when SPAs swap `<body>` entirely and re-injects the UI within 100 ms
+- **Iframe guard** — timing hooks apply in all frames, but the bubble UI only renders on `window.top` (prevents duplicate bubbles in iframed pages)
+- **Media playback-rate sync** — automatically adjusts `<video>` and `<audio>` `playbackRate` when speed changes
+- **Media element tracking** — intercepts `document.createElement('video'|'audio')` and uses a MutationObserver to catch dynamically-added media
+- **Fallback parent resolution** — `getParent()` tries `document.body → documentElement → querySelector('html')` before giving up
+- `data-th="1"` attribute on host element for easier debugging
+- Explicit `opacity:1!important; visibility:visible!important; display:block!important` on host to survive page CSS resets
+- 30-second safety timeout on boot observers and polling to prevent resource leaks
+
+### Fixed
+- Script failing on modern SPAs like rarestudy.site that build the DOM asynchronously
+- UI disappearing on sites that dynamically replace `<body>` (e.g., React/Next.js hydration)
+- Crash when `document.documentElement` doesn't exist at `@run-at document-start`
+- Duplicate bubble appearing in pages with iframes
+- `attachShadow()` failure crashing the entire script instead of falling back gracefully
+
+---
+
 ## [2.0] - 2026-03-23
 
 ### Changed
