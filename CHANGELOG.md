@@ -7,83 +7,82 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.0] - 2026-04-14
+
+### Added
+- **Double-injection guard** — `Object.defineProperty(window, '__timeHookerActive', { writable: false })` prevents any duplicate execution across iframes or SPA re-mounts
+- **FakeDate as class extension** — `class FakeDate extends Date` with `Symbol.hasInstance` so `instanceof Date` checks pass correctly; `Date.length` set to 7 to match native
+- **Performance.prototype.now hook** — hooks at the prototype level instead of the instance, so all Performance instances (including inside iframes) are automatically covered
+- **Virtual timeout ID mapping** — `setTimeout` returns virtual IDs mapped to real IDs via `_timeoutMap`, ensuring `clearTimeout` always cancels the correct timer
+- **Interval map size cap** — `MAX_TRACKED_INTERVALS = 500` prevents unbounded memory growth from leaked intervals
+- **Multi-pass rAF** — `requestAnimationFrame` fires multiple callback batches per real frame when speed > 1x; throttles via setTimeout when speed < 1x for accurate slow-motion
+- **Web Worker hooking** — intercepts `Worker` constructor, prepends timing hooks via Blob URL + `importScripts`, and broadcasts speed changes to workers via `postMessage`
+- **Same-origin iframe injection** — propagates all timing hooks (`Date`, `performance.now`, `setTimeout`, `setInterval`, `rAF`) into same-origin iframes at load time
+- **Iframe creation interception** — `document.createElement('iframe')` is intercepted to auto-inject hooks on load
+- **Hook re-injection guard** — polls every 2s to detect if SPA frameworks overwrote our `window.setTimeout`/`Date`/etc. and restores them
+- **Toggle remembers speed** — disabling the hook saves the current speed; re-enabling restores it (instead of always resetting to 1x)
+- **Custom input validation feedback** — invalid custom speed shows red border flash for 800ms
+- **Input event isolation** — `keyup` and `keypress` also stopPropagation to prevent page scripts from eating typed characters
+- **composedPath() click detection** — outside-click panel close uses `e.composedPath()` for proper Shadow DOM awareness
+- **50x preset** — preset grid now includes 50x (12 presets total in 4-column layout)
+- **Section labels** — panel has "Presets", "Fine-tune", "Custom Speed" section headers
+- **Hook status indicator** — shows "Active" (green) or "Paused" (red) next to the toggle
+- **Polished dark UI** — dark slate bubble (rgba(15,23,42,.82)), 28px speed label, 4-column grid, improved typography and spacing
+
+### Changed
+- `Date` is now set via `Object.defineProperty(window, 'Date', { get: () => FakeDate })` with fallback to direct assignment — more resilient against page scripts that check descriptors
+- Slider max raised from 25 to 50
+- Keyboard shortcuts moved to capture phase for better interception reliability
+- Speed clamping uses `Math.max(0.01, Math.min(100, s))` in `setSpeed()` for safety
+- Interval restart on speed change now mutates the existing entry's `rId` instead of delete-and-re-add
+
+---
+
 ## [3.1] - 2026-04-14
 
 ### Added
-- **CSS Animation & Transition speed control** — uses `document.getAnimations()` to set `playbackRate` on all running CSS animations and transitions
-- **Web Animations API hook** — intercepts `Element.prototype.animate()`, scaling `duration`, `delay`, and `endDelay` by the speed multiplier and setting `playbackRate` on returned animations
-- **Continuous animation poll** — polls every 500 ms to catch newly-created animations and apply the current speed, ensuring dynamically-added CSS animations are also affected
-- **Auto-cleanup** — CSS speed overrides are automatically removed when speed resets to 1x
-- **Debug logging** — 16 log points with `[TimeHooker]` prefix (green in console) for easy troubleshooting; controlled by `TH_DEBUG` flag
-
-### Changed
-- Speed setter (`setSpeed()`) now also triggers CSS animation sync and starts the animation poll
-- Boot sequence now activates CSS/animation hooks immediately if a non-1x speed is persisted from localStorage
+- **CSS Animation & Transition speed control** — uses `document.getAnimations()` to set `playbackRate`
+- **Web Animations API hook** — intercepts `Element.prototype.animate()`
+- **Continuous animation poll** — polls every 500ms for newly-created animations
+- **Debug logging** — 16 log points with `[TimeHooker]` prefix
 
 ---
 
 ## [3.0] - 2026-04-14
 
 ### Changed
-- **Hardened boot sequence** — 5-strategy approach (direct check → DOMContentLoaded → readystatechange → MutationObserver → polling fallback) ensures the UI appears on virtually any site
-- MutationObserver now targets `document.documentElement || document` with `subtree: true` instead of just `childList` on documentElement
-- All timing hooks wrapped in individual `try/catch` blocks — if one hook fails (e.g., site freezes prototypes), others still apply
-- Shadow DOM creation now uses fallback chain: closed → open → plain div
-- Saved native `MutationObserver` reference to prevent sites from overriding it
-- Outside-click listener now uses capture phase for maximum reliability
-- `getHTML()` uses concatenated strings instead of template literals for broader engine compatibility
+- Hardened 5-strategy boot sequence
+- All hooks wrapped in individual try/catch
+- Shadow DOM fallback chain: closed → open → plain div
+- Saved native MutationObserver reference
 
 ### Added
-- **Watchdog system** — polls every 2 s to verify the UI host element is still in the DOM; re-injects automatically if removed by SPAs or page frameworks
-- **Body-replacement observer** — detects when SPAs swap `<body>` entirely and re-injects the UI within 100 ms
-- **Iframe guard** — timing hooks apply in all frames, but the bubble UI only renders on `window.top` (prevents duplicate bubbles in iframed pages)
-- **Media playback-rate sync** — automatically adjusts `<video>` and `<audio>` `playbackRate` when speed changes
-- **Media element tracking** — intercepts `document.createElement('video'|'audio')` and uses a MutationObserver to catch dynamically-added media
-- **Fallback parent resolution** — `getParent()` tries `document.body → documentElement → querySelector('html')` before giving up
-- `data-th="1"` attribute on host element for easier debugging
-- Explicit `opacity:1!important; visibility:visible!important; display:block!important` on host to survive page CSS resets
-- 30-second safety timeout on boot observers and polling to prevent resource leaks
+- Watchdog system (2s poll + body-replacement observer)
+- Iframe guard (UI on top frame only)
+- Media playback-rate sync
+- 30s safety timeouts on boot observers
 
 ### Fixed
-- Script failing on modern SPAs like rarestudy.site that build the DOM asynchronously
-- UI disappearing on sites that dynamically replace `<body>` (e.g., React/Next.js hydration)
-- Crash when `document.documentElement` doesn't exist at `@run-at document-start`
-- Duplicate bubble appearing in pages with iframes
-- `attachShadow()` failure crashing the entire script instead of falling back gracefully
+- Script failing on async-DOM SPAs
+- UI disappearing on body replacement
+- Crash when documentElement missing at document-start
 
 ---
 
 ## [2.0] - 2026-03-23
 
 ### Changed
-- **Complete rewrite** for reliability across all websites
-- Switched to `@grant none` — script now runs in the page's native JS context instead of Tampermonkey's sandbox
-- Replaced CSS-reset approach (`all: initial`) with **closed Shadow DOM** for bulletproof CSS isolation
-- UI now attaches to `document.body` with `MutationObserver` fallback (instead of `document.documentElement`)
-- Simplified and optimized all timing hooks
+- Complete rewrite: `@grant none` + closed Shadow DOM
 
 ### Added
-- Closed Shadow DOM — page CSS can never interfere with the UI, and vice versa
-- `MutationObserver`-based boot sequence ensures UI appears even on dynamically-built pages
-- `Alt+Up`/`Alt+Down` keyboard shortcuts to step through speed presets
-- Continuous fine-tune slider (0.05x - 25x)
-- Custom speed input field (0.01x - 100x)
-- Hook Active toggle to disable/enable time manipulation without uninstalling
-- Speed badge color coding: green (>1x), amber (<1x), grey (1x)
+- MutationObserver boot, Alt+Up/Down shortcuts, slider, custom input, hook toggle
 
 ### Fixed
-- Green bubble not appearing on any page (sandbox isolation issue)
-- Keyboard shortcuts not firing (event listeners were on sandbox document)
-- CSS conflicts with host page styles
+- Bubble not appearing (sandbox isolation), keyboard shortcuts not firing
 
 ---
 
 ## [1.0] - 2026-03-23
 
 ### Added
-- Initial release
-- Hooks: `setTimeout`, `setInterval`, `Date`, `Date.now()`, `performance.now()`, `requestAnimationFrame`
-- Floating green bubble UI with speed presets
-- Keyboard shortcuts: `Alt+T` (toggle panel), `Alt+R` (reset to 1x)
-- Speed persistence via `localStorage`
-- Universal `@match *://*/*`
+- Initial release with timing hooks, green bubble UI, keyboard shortcuts, localStorage persistence
