@@ -4,7 +4,7 @@
 
 ### Speed Up or Slow Down Any Webpage — Right From Your Browser
 
-[![Install with Tampermonkey](https://img.shields.io/badge/Install-Tampermonkey-00485B?style=for-the-badge&logo=tampermonkey&logoColor=white)](https://github.com/BlankHead2004/Time-Hooker/blob/main/TimeHooker.user.js)
+[![Install with Tampermonkey](https://img.shields.io/badge/Install-Tampermonkey-00485B?style=for-the-badge&logo=tampermonkey&logoColor=white)](https://greasyfork.org/en/scripts/571054-time-hooker)
 [![License: MIT](https://img.shields.io/badge/License-MIT-22c55e?style=for-the-badge)](LICENSE)
 [![Version](https://img.shields.io/badge/Version-2.0-blue?style=for-the-badge)]()
 [![Tampermonkey](https://img.shields.io/badge/Tampermonkey-Compatible-orange?style=for-the-badge&logo=tampermonkey)]()
@@ -100,7 +100,7 @@ You need a userscript manager extension:
 
 1. **Click the button below** — Tampermonkey will detect it automatically:
 
-   [![Install TimeHooker](https://img.shields.io/badge/⏱️_Install_TimeHooker-Click_Here-22c55e?style=for-the-badge&logoColor=white)](https://greasyfork.org/en/scripts/571054-time-hooker))
+   [![Install TimeHooker](https://img.shields.io/badge/⏱️_Install_TimeHooker-Click_Here-22c55e?style=for-the-badge&logoColor=white)](https://greasyfork.org/en/scripts/571054-time-hooker)
 
 2. Tampermonkey will show a confirmation dialog → click **Install**.
 3. Done. Visit any page and look for the **green bubble** on the left edge.
